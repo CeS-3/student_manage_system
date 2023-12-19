@@ -15,7 +15,7 @@ type Student struct{
 }
 //学生表的插入操作
 func (student Student) insert(db *sql.DB) error{
-	query := "INSERT INTO student (Sno, Sname, Ssex, Sage, Sdept, Scholarship) VALUES (?, ?, ?, ?, ?, ?)"
+	query := "INSERT INTO Student (Sno, Sname, Ssex, Sage, Sdept, Scholarship) VALUES (?, ?, ?, ?, ?, ?)"
 
 	// 执行插入操作
 	_, err := db.Exec(query, student.Sno, student.Sname, student.Ssex, student.Sage, student.Sdept, student.Scholarship)
@@ -54,7 +54,7 @@ type Course struct{
 //获取表中所有的课程信息
 func getAllCourses(db *sql.DB) ([]Course, error) {
 	// 查询数据库中的课程表
-    rows, err := db.Query("SELECT Cno, Cname, Cpno, Ccredit FROM courses")
+    rows, err := db.Query("SELECT Cno, Cname, Cpno, Ccredit FROM Courses")
     if err != nil {
         return nil, err
     }
@@ -79,10 +79,16 @@ func getAllCourses(db *sql.DB) ([]Course, error) {
 //修改课程信息
 func updateCourseInformation(db *sql.DB, courseID string, updatedCourse Course) error {
 	// 执行数据库更新操作，更新指定 ID 的课程信息
+	//构造查询语句
+	query := "UPDATE Course SET Cname = ?,Cpno = ?,Ccredit = ?"
+	//执行语句
+	_,err := db.Exec(query,updatedCourse.Cname,updatedCourse.Cpno,updatedCourse.Ccredit)	
+	if err != nil{
+		return err
+	}
 	
-	
-	// 假设这里执行一个更新的示例操作
-	fmt.Printf("Updated course with ID %s\n", courseID)
+	// 执行成功输出
+	fmt.Printf("Updated Course with ID %s\n", courseID)
 	return nil
 }
 //删除课程信息

@@ -68,7 +68,8 @@ func main(){
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update course"})
 			return
-		}	
+		}
+	})	
 	//删除课程
 	r.DELETE("/courses/:id", func(c *gin.Context) {
 		// 从路由参数中获取课程 ID
@@ -80,11 +81,9 @@ func main(){
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete course"})
 			return
 		}
-
 		// 返回成功信息给前端
 		c.JSON(http.StatusOK, gin.H{"message": "Course deleted successfully"})
 	})
-	
 }
 func ()
 
