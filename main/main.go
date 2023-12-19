@@ -42,6 +42,62 @@ func main(){
 	defer db.Close()
 	//初始化gin引擎
 	r := gin.Default()
+	//展示学生信息
+	r.GET("/students", func(c *gin.Context) {
+		// 获取数据库中所有学生信息
+		students, err := dbstruct.GetAllStudents(db)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve students"})
+			return
+		}
+
+		// 返回学生信息给前端
+		c.JSON(http.StatusOK, students)
+	})
+	//添加新生
+	r.POST("/students/add", func(c *gin.Context) {
+		// 获取用户提交的新生信息
+		var newCourse dbstruct.Student
+		if err := c.ShouldBindJSON(&newCourse); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
+			return
+		}
+
+		// 执行插入操作
+		err := newCourse.AddNewStudent(db)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert course"})
+			return
+		}
+
+		// 返回成功信息给前端
+		c.JSON(http.StatusOK, gin.H{"message": "Course added successfully"})
+	})
+	//更新学生信息
+	r.POST("/students/:id/edit",func(c *gin.Context) {
+		//从前端获取学号
+		studentID := c.Param("id")
+		var updateStudent dbstruct.Student
+		if err := c.ShouldBind(&updateStudent);err != nil{
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
+		}
+		err = dbstruct.UpdateStudentInformation(db,studentID,updateStudent)
+		if err != nil{
+			c.JSON(http.StatusInternalServerError,gin.H{"error": "Failed to update Student"})
+		}
+	})
+	//删除学生信息
+	r.DELETE("/students/:id", func(c *gin.Context){
+		studentID := c.Param("id")
+		// 执行删除操作
+		err := dbstruct.DeleteStudentFromDB(db, studentID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete student"})
+			return
+		}
+		// 返回成功信息给前端
+		c.JSON(http.StatusOK, gin.H{"message": "Student deleted successfully"})
+	})
 	//展示所有课程信息
 	r.GET("/courses", func(c *gin.Context) {
 		// 查询数据库中的所有课程
@@ -52,6 +108,25 @@ func main(){
 		}
 		// 返回课程列表给前端
 		c.JSON(http.StatusOK, courses)
+	})
+	//添加课程
+	r.POST("/courses/add", func(c *gin.Context) {
+		// 获取用户提交的新增课程信息
+		var newCourse dbstruct.Course
+		if err := c.ShouldBindJSON(&newCourse); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
+			return
+		}
+
+		// 执行插入操作
+		err := newCourse.AddNewCourse(db)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert course"})
+			return
+		}
+
+		// 返回成功信息给前端
+		c.JSON(http.StatusOK, gin.H{"message": "Course added successfully"})
 	})
 	//修改课程信息,一次只能修改一条
 	r.POST("/courses/:id/edit", func(c *gin.Context) {
@@ -65,7 +140,7 @@ func main(){
 		}
 
 		// 执行更新操作
-		err := dbstruct.UpdateCourseInformation(db, courseID, updatedCourse)
+		err = dbstruct.UpdateCourseInformation(db, courseID, updatedCourse)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update course"})
 			return
