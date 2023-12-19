@@ -83,23 +83,70 @@ func DeleteStudentFromDB(db *sql.DB,studentID string) error{
 	fmt.Printf("Delete Student with ID %s\n",studentID)
 	return nil
 }
-// //学生表的删除操作
-// func (student Student) delete(db *sql.DB) error{
-	
-// }
-// //学生表的修改操作
-// func (student Student) update(db *sql.DB) error{
-	
-// }
-// //学生表的搜索操作
-// func (student Student) search(db *sql.DB) error{
-	
-// }
+
 //学生-课程结构
-type SC struct{
+
+type Grade struct{
+	Rank int
+	Sname string
 	Sno int
+	Cname string
 	Cno int
-	Grade int
+	_grade int
+}
+type GradeAttribution struct{
+	Sdept string
+	avg float64
+	max int
+	min int
+	Erate float64  //优秀率
+	failers int	 //不及格人数
+}
+//成绩插入操作
+func (grade Grade) AddNewGrade(db *sql.DB) error{
+	query := "INSERT INTO SC (Sno, Cno, Grade) VALUES(?,?,?)" 
+	
+	_,err := db.Exec(query,grade.Sno,grade.Cno,grade._grade)
+	if err != nil{
+		return err
+	}
+
+	fmt.Println("成绩插入成功")
+	return nil
+}
+//查询所有学生的成绩
+func GetAllOrderedGrades(db *sql.DB) ([]Grade,error){
+	//查询学生的姓名，对应的课程名，对应的成绩
+	rows,err := db.Query(`
+	SELECT ROW_NUMBER() OVER (ORDER BY SC.Grade DESC) AS Rank, 
+	Student.Sname,Student.Sno,Course.Cname,Course.Cno,SC.Grade 
+	FROM Student,Course,SC 
+	WHERE SC.Sno=Student.Sno 
+	AND SC.Cno=Course.Cno 
+	ORDER BY SC.Grade DESC`)
+	if err != nil{
+		return nil,err
+	}
+	defer rows.Close()
+	//用于存储成绩
+	var grades []Grade
+	for rows.Next(){
+        var grade Grade
+        if err := rows.Scan(&grade.Rank,&grade.Sname,&grade.Sno,&grade.Cname,&grade.Cno,&grade._grade); err != nil {
+            return nil, err
+        }
+        grades = append(grades, grade)
+	}
+
+	if err := rows.Err(); err != nil {
+        return nil, err
+    }
+
+	return grades,nil
+}
+//修改成绩
+func UpdateGradeInformation(db, studentID, courseID, updatedGrade){
+
 }
 //课程结构
 type Course struct{
@@ -108,7 +155,7 @@ type Course struct{
 	Cpno int
 	Ccredit int	
 }
-//学生表的插入操作
+//课程表的插入操作
 func (course Course) AddNewCourse(db *sql.DB) error{
 	query := "INSERT INTO Course (Cno,Cname,Cpno,Ccredit) VALUES (?,?,?,?)"
 
@@ -178,3 +225,4 @@ func DeleteCourseFromDB(db *sql.DB, courseID string) error{
 	fmt.Printf("Delete Course with ID %s\n",courseID)
 	return nil
 }
+

@@ -160,7 +160,59 @@ func main(){
 		// 返回成功信息给前端
 		c.JSON(http.StatusOK, gin.H{"message": "Course deleted successfully"})
 	})
-	
+	//成绩展示界面
+	r.GET("/grades",func(c *gin.Context) {
+		//获取排序后的成绩
+		grades,err := dbstruct.GetAllOrderedGrades(db)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve grades"})
+			return
+		}
+		//传递给前端页面
+		c.JSON(http.StatusOK,grades)
+	})
+	//录入学生成绩
+	r.POST("/grades/add", func(c *gin.Context) {
+		// 获取用户提交的新增成绩信息
+		var newGrade dbstruct.Grade
+		if err := c.ShouldBind(&newGrade); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
+			return
+		}
+
+		// 执行插入操作
+		err := newGrade.AddNewGrade(db)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert grade"})
+			return
+		}
+
+		// 返回成功信息给前端
+		c.JSON(http.StatusOK, gin.H{"message": "Grade added successfully"})
+	})
+	//修改学生成绩
+	r.POST("/grades/:sno/:cno/edit", func(c *gin.Context) {
+		// 从路由参数中获取学号和课程号
+		studentID := c.Param("sno")
+		courseID := c.Param("cno")
+
+		// 获取用户提交的修改后的成绩信息
+		var updatedGrade dbstruct.Grade
+		if err := c.ShouldBind(&updatedGrade); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
+			return
+		}
+
+		// 执行更新操作
+		err := dbstruct.UpdateGradeInformation(db, studentID, courseID, updatedGrade)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update grade"})
+			return
+		}
+		// 返回成功信息给前端
+		c.JSON(http.StatusOK, gin.H{"message": "Grade updated successfully"})
+	})
+
 }
 
 
