@@ -6,6 +6,8 @@ import (
 	"os"
 	_ "github.com/go-sql-driver/mysql"
 	"student_manage_system/dbstruct"
+	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 //连接主机
@@ -40,11 +42,10 @@ func main(){
 	defer db.Close()
 	//初始化gin引擎
 	r := gin.Default()
-
 	//展示所有课程信息
 	r.GET("/courses", func(c *gin.Context) {
 		// 查询数据库中的所有课程
-		courses, err := dbstruct.getAllCourses(db)
+		courses, err := dbstruct.GetAllCourses(db)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"错误": "获取课程失败"})
 			return
@@ -64,7 +65,7 @@ func main(){
 		}
 
 		// 执行更新操作
-		err := dbstruct.updateCourseInformation(db, courseID, updatedCourse)
+		err := dbstruct.UpdateCourseInformation(db, courseID, updatedCourse)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update course"})
 			return
@@ -76,7 +77,7 @@ func main(){
 		courseID := c.Param("id")
 
 		// 执行删除操作
-		err := dbstruct.deleteCourseFromDB(db, courseID)
+		err := dbstruct.DeleteCourseFromDB(db, courseID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete course"})
 			return
@@ -84,6 +85,7 @@ func main(){
 		// 返回成功信息给前端
 		c.JSON(http.StatusOK, gin.H{"message": "Course deleted successfully"})
 	})
+	
 }
-func ()
+
 

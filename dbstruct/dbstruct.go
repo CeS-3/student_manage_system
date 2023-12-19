@@ -52,7 +52,7 @@ type Course struct{
 	Ccredit int	
 }
 //获取表中所有的课程信息
-func getAllCourses(db *sql.DB) ([]Course, error) {
+func GetAllCourses(db *sql.DB) ([]Course, error) {
 	// 查询数据库中的课程表
     rows, err := db.Query("SELECT Cno, Cname, Cpno, Ccredit FROM Courses")
     if err != nil {
@@ -77,7 +77,7 @@ func getAllCourses(db *sql.DB) ([]Course, error) {
     return courses, nil
 }
 //修改课程信息
-func updateCourseInformation(db *sql.DB, courseID string, updatedCourse Course) error {
+func UpdateCourseInformation(db *sql.DB, courseID string, updatedCourse Course) error {
 	// 执行数据库更新操作，更新指定 ID 的课程信息
 	//构造查询语句
 	query := "UPDATE Course SET Cname = ?,Cpno = ?,Ccredit = ?"
@@ -86,13 +86,25 @@ func updateCourseInformation(db *sql.DB, courseID string, updatedCourse Course) 
 	if err != nil{
 		return err
 	}
-	
-	// 执行成功输出
+	//执行成功输出
 	fmt.Printf("Updated Course with ID %s\n", courseID)
 	return nil
 }
 //删除课程信息
-func deleteCourseFromDB(db *sql.DB, courseID string) error{
+func DeleteCourseFromDB(db *sql.DB, courseID string) error{
 	//执行数据库删除操作，删除指定 ID 的课程信息
-	
+	qurey1 := "DELETE FROM Course WHERE Cno = ?"
+	_,err := db.Exec(qurey1,courseID)
+	if err != nil{
+		return err
+	}
+	//同时也要删除掉SC表中对应的内容
+	qurey2 := "DELETE FROM SC WHERE Cno = ?"
+	_,err = db.Exec(qurey2,courseID)
+	if err != nil{
+		return err
+	}
+	//执行成功输出
+	fmt.Printf("Delete Course with ID %s\n",courseID)
+	return nil
 }
