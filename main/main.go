@@ -45,6 +45,11 @@ func main(){
 	defer db.Close()
 	//初始化gin引擎
 	r := gin.Default()
+	r.GET("/",func(c *gin.Context) {
+		c.HTML(http.StatusOK, "web/index.html", gin.H{
+			"title": "欢迎使用学生管理系统",
+		})
+	})
 	//展示学生信息
 	r.GET("/students", func(c *gin.Context) {
 		// 获取数据库中所有学生信息
@@ -78,7 +83,7 @@ func main(){
 		c.JSON(http.StatusOK, gin.H{"message": "Student added successfully"})
 	})
 	//更新学生信息
-	r.POST("/students/:id/edit",func(c *gin.Context) {
+	r.POST("/students/edit",func(c *gin.Context) {
 		//从前端获取更新的学生信息
 		var updateStudent dbstruct.Student
 		updateStudent.InitStudent()

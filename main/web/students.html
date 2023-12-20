@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生信息</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <table id="studentsTable">
+        <thead>
+            <tr>
+                <th>学号</th>
+                <th>姓名</th>
+                <th>性别</th>
+                <th>年龄</th>
+                <th>专业</th>
+                <th>奖学金</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- 学生信息将动态填充至此 -->
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 获取学生信息并显示
+            fetchStudents();
+
+            function fetchStudents() {
+                fetch("/students")
+                    .then(response => response.json())
+                    .then(students => {
+                        displayStudents(students);
+                    })
+                    .catch(error => console.error('Error fetching students:', error));
+            }
+
+            function displayStudents(students) {
+                const tableBody = document.querySelector("#studentsTable tbody");
+                tableBody.innerHTML = "";
+
+                students.forEach(student => {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${student.Sno}</td>
+                        <td>${student.Sname.String || ""}</td>
+                        <td>${student.Ssex.String || ""}</td>
+                        <td>${student.Sage.Int32 || ""}</td>
+                        <td>${student.Sdept.String || ""}</td>
+                        <td>${student.Scholarship.String || ""}</td>
+                        <td>
+                            <button onclick="updateStudent('${student.Sno}')">更新</button>
+                            <button onclick="deleteStudent('${student.Sno}')">删除</button>
+                        </td>
+                    `;
+                });
+            }
+
+            window.updateStudent = function(studentID) {
+                // 此处添加更新学生信息的逻辑
+                console.log(`Update student with ID: ${studentID}`);
+            }
+
+            window.deleteStudent = function(studentID) {
+                const confirmDelete = confirm("确定要删除该学生吗？");
+                if (confirmDelete) {
+                    fetch(`/students/${studentID}`, { method: 'DELETE' })
+                        .then(response => response.json())
+                        .then(result => {
+                            console.log(result.message);
+                            fetchStudents(); // 刷新学生信息
+                        })
+                        .catch(error => console.error('Error deleting student:', error));
+                }
+            }
+        });
+    </script>
+</body>
+</html>

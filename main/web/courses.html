@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课程信息</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <table id="coursesTable">
+        <thead>
+            <tr>
+                <th>课程号</th>
+                <th>课程名</th>
+                <th>先修课程号</th>
+                <th>学分</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- 课程信息将动态填充至此 -->
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 获取课程信息并显示
+            fetchCourses();
+
+            function fetchCourses() {
+                fetch("/courses")
+                    .then(response => response.json())
+                    .then(courses => {
+                        displayCourses(courses);
+                    })
+                    .catch(error => console.error('Error fetching courses:', error));
+            }
+
+            function displayCourses(courses) {
+                const tableBody = document.querySelector("#coursesTable tbody");
+                tableBody.innerHTML = "";
+
+                courses.forEach(course => {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${course.Cno}</td>
+                        <td>${course.Cname.String || ""}</td>
+                        <td>${course.Cpno.Int32 || ""}</td>
+                        <td>${course.Ccredit.Int32 || ""}</td>
+                        <td>
+                            <button onclick="updateCourse('${course.Cno}')">更新</button>
+                            <button onclick="deleteCourse('${course.Cno}')">删除</button>
+                        </td>
+                    `;
+                });
+            }
+
+            window.updateCourse = function(courseID) {
+                // 此处添加更新课程信息的逻辑
+                console.log(`Update course with ID: ${courseID}`);
+            }
+
+            window.deleteCourse = function(courseID) {
+                const confirmDelete = confirm("确定要删除该课程吗？");
+                if (confirmDelete) {
+                    fetch(`/courses/${courseID}`, { method: 'DELETE' })
+                        .then(response => response.json())
+                        .then(result => {
+                            console.log(result.message);
+                            fetchCourses(); // 刷新课程信息
+                        })
+                        .catch(error => console.error('Error deleting course:', error));
+                }
+            }
+        });
+    </script>
+</body>
+</html>

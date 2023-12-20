@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生管理系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1em;
+        }
+
+        nav {
+            background-color: #f0f0f0;
+            padding: 1em;
+            width: 200px;
+            position: fixed;
+            height: 100%;
+            overflow: auto;
+        }
+
+        main {
+            margin-left: 220px;
+            padding: 1em;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>学生管理系统</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#students">学生信息</a></li>
+            <li><a href="#courses">课程信息</a></li>
+            <li><a href="#grades">成绩信息</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- 学生信息 -->
+        <section id="students">
+            <h2>学生信息</h2>
+            <iframe src="students.html" width="100%" height="600px" frameborder="0"></iframe>
+        </section>
+
+        <!-- 课程信息 -->
+        <section id="courses">
+            <h2>课程信息</h2>
+            <iframe src="courses.html" width="100%" height="600px" frameborder="0"></iframe>
+        </section>
+
+        <!-- 成绩信息 -->
+        <section id="grades">
+            <h2>成绩信息</h2>
+            <iframe src="grades.html" width="100%" height="600px" frameborder="0"></iframe>
+        </section>
+    </main>
+</body>
+</html>
