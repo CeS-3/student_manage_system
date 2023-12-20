@@ -86,7 +86,6 @@ func DeleteStudentFromDB(db *sql.DB,studentID string) error{
 
 //成绩
 type Grade struct{
-	Rank int
 	Sname string
 	Sno int
 	Cname string
@@ -109,12 +108,11 @@ func (grade Grade) AddNewGrade(db *sql.DB) error{
 func GetAllOrderedGrades(db *sql.DB) ([]Grade,error){
 	//查询学生的姓名，对应的课程名，对应的成绩
 	rows,err := db.Query(`
-	SELECT ROW_NUMBER() OVER (ORDER BY SC.Grade DESC) AS Rank, 
+	SELECT
 	Student.Sname,Student.Sno,Course.Cname,Course.Cno,SC.Grade 
 	FROM Student,Course,SC 
 	WHERE SC.Sno=Student.Sno 
-	AND SC.Cno=Course.Cno 
-	ORDER BY SC.Grade DESC`)
+	AND SC.Cno=Course.Cno `)
 	if err != nil{
 		return nil,err
 	}
@@ -123,7 +121,7 @@ func GetAllOrderedGrades(db *sql.DB) ([]Grade,error){
 	var grades []Grade
 	for rows.Next(){
         var grade Grade
-        if err := rows.Scan(&grade.Rank,&grade.Sname,&grade.Sno,&grade.Cname,&grade.Cno,&grade._grade); err != nil {
+        if err := rows.Scan(&grade.Sname,&grade.Sno,&grade.Cname,&grade.Cno,&grade._grade); err != nil {
             return nil, err
         }
         grades = append(grades, grade)
@@ -147,13 +145,13 @@ func UpdateGradeInformation(db *sql.DB, updatedGrade Grade) error{
 }
 //搜索成绩
 func SearchGrade(db *sql.DB, studentID string)([]Grade,error){
-	query := `SELECT ROW_NUMBER() OVER (ORDER BY SC.Grade DESC) AS Rank, 
+	query := `SELECT 
 	Student.Sname,Student.Sno,Course.Cname,Course.Cno,SC.Grade 
 	FROM Student,Course,SC 
 	WHERE SC.Sno=Student.Sno 
 	AND SC.Cno=Course.Cno
 	AND Student.Sno=? 
-	ORDER BY SC.Grade DESC`
+	`
 	rows,err := db.Query(query,studentID)
 	if err != nil{
 		return nil,err
@@ -162,7 +160,7 @@ func SearchGrade(db *sql.DB, studentID string)([]Grade,error){
 	var SearchResults []Grade
 	for rows.Next(){
 		var SearchResult Grade
-		if err := rows.Scan(&SearchResult.Rank,&SearchResult.Sname,&SearchResult.Sno,&SearchResult.Cname,&SearchResult.Cno,&SearchResult._grade); err != nil{
+		if err := rows.Scan(&SearchResult.Sname,&SearchResult.Sno,&SearchResult.Cname,&SearchResult.Cno,&SearchResult._grade); err != nil{
 			return nil,err
 		} 
 		SearchResults = append(SearchResults, SearchResult)
@@ -208,6 +206,45 @@ func GetAllGradesAttribution(db *sql.DB) ([]GradeAttribution,error){
 		return nil,err
 	}
 	return attributions,err
+}
+//排名结构
+type Rank struct{
+	_rank int
+	Sdept string
+	Sno string
+	Sname string
+}
+func GetAllRanks(db *sql.DB) ([]Rank,error){
+	rows, err := db.Query(`SELECT
+    RANK() OVER (PARTITION BY s.Sdept ORDER BY SUM(sc.Grade) DESC) AS Ranking,
+    s.Sdept AS Department,
+    s.Sno AS StudentID,
+    s.Sname AS StudentName
+FROM
+    Student s, SC sc
+WHERE
+    s.Sno = sc.Sno
+GROUP BY
+    s.Sdept, s.Sno, s.Sname
+ORDER BY
+    Department, Ranking;
+`)
+	if err != nil{
+		return nil,err
+	}
+	defer rows.Close()
+	var ranks []Rank
+	for rows.Next(){
+		var rank Rank
+		if err := rows.Scan(&rank._rank,&rank.Sdept,&rank.Sno,&rank.Sname);err != nil{
+			return nil,err
+		}
+		ranks = append(ranks,rank)
+	}
+	if err := rows.Err(); err != nil{
+		return nil,err
+	}
+	return ranks,err
 }
 //课程结构
 type Course struct{

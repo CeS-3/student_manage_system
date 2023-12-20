@@ -207,13 +207,22 @@ func main(){
 		c.JSON(http.StatusOK, gin.H{"message": "Grade updated successfully"})
 	})
 	//展示成绩统计量
-	r.POST("/grades/attribution",func(c *gin.Context) {
+	r.GET("/grades/attribution",func(c *gin.Context) {
 		attributions,err := dbstruct.GetAllGradesAttribution(db)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve grades attributions"})
 			return
 		}
 		c.JSON(http.StatusOK,attributions)
+	})
+	//设置排名展示页面
+	r.GET("/grades/rank",func(c *gin.Context) {
+		ranks,err := dbstruct.GetAllRanks(db)
+		if err != nil{
+			c.JSON(http.StatusInternalServerError,gin.H{"error": "Failed to retrieve ranks"})
+			return
+		}
+		c.JSON(http.StatusOK,ranks)
 	})
 	//设置搜索页面
 	r.GET("/grades/search/:sno",func(c *gin.Context) {
