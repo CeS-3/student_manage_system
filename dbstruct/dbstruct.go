@@ -6,12 +6,12 @@ import (
 )
 //学生结构
 type Student struct{
-	Sno int
-	Sname string
-	Ssex string
-	Sage int
-	Sdept string
-	Scholarship string
+	Sno string 
+	Sname sql.NullString
+	Ssex sql.NullString
+	Sage sql.NullInt32
+	Sdept sql.NullString
+	Scholarship sql.NullString
 }
 //学生表的插入操作
 func (student Student) AddNewStudent(db *sql.DB) error{
@@ -62,19 +62,19 @@ func UpdateStudentInformation(db *sql.DB,updateStudent Student) error{
 		return err
 	}
 	//执行成功输出
-	fmt.Printf("Updated Course with ID %d\n", updateStudent.Sno)
+	fmt.Printf("Updated Course with ID %s\n", updateStudent.Sno)
 	return nil
 }
 //删除学生信息
 func DeleteStudentFromDB(db *sql.DB,studentID string) error{
-	//执行数据库删除操作，删除指定 ID 的课程信息
-	qurey1 := "DELETE FROM Student WHERE Sno = ?"
+	//执行数据库删除操作，删除指定 ID 的SC信息
+	qurey1 := "DELETE FROM SC WHERE Sno = ?"
 	_,err := db.Exec(qurey1,studentID)
 	if err != nil{
 		return err
 	}
-	//同时也要删除掉SC表中对应的内容
-	qurey2 := "DELETE FROM SC WHERE Sno = ?"
+	//同时也要删除掉学生表中对应的内容
+	qurey2 := "DELETE FROM Student WHERE Sno = ?"
 	_,err = db.Exec(qurey2,studentID)
 	if err != nil{
 		return err
@@ -86,17 +86,17 @@ func DeleteStudentFromDB(db *sql.DB,studentID string) error{
 
 //成绩
 type Grade struct{
-	Sname string
-	Sno int
-	Cname string
+	Sname sql.NullString
+	Sno string
+	Cname sql.NullString
 	Cno int
-	_grade int
+	Ggrade sql.NullInt32
 }
 //成绩插入操作
 func (grade Grade) AddNewGrade(db *sql.DB) error{
 	query := "INSERT INTO SC (Sno, Cno, Grade) VALUES(?,?,?)" 
 	
-	_,err := db.Exec(query,grade.Sno,grade.Cno,grade._grade)
+	_,err := db.Exec(query,grade.Sno,grade.Cno,grade.Ggrade)
 	if err != nil{
 		return err
 	}
@@ -121,7 +121,7 @@ func GetAllOrderedGrades(db *sql.DB) ([]Grade,error){
 	var grades []Grade
 	for rows.Next(){
         var grade Grade
-        if err := rows.Scan(&grade.Sname,&grade.Sno,&grade.Cname,&grade.Cno,&grade._grade); err != nil {
+        if err := rows.Scan(&grade.Sname,&grade.Sno,&grade.Cname,&grade.Cno,&grade.Ggrade); err != nil {
             return nil, err
         }
         grades = append(grades, grade)
@@ -136,7 +136,7 @@ func GetAllOrderedGrades(db *sql.DB) ([]Grade,error){
 //修改成绩
 func UpdateGradeInformation(db *sql.DB, updatedGrade Grade) error{
 	query := "UPDATE SC SET Grade = ? WHERE Sno = ? AND Cno = ?"
-	_, err := db.Exec(query,updatedGrade._grade,updatedGrade.Sno,updatedGrade.Cno)
+	_, err := db.Exec(query,updatedGrade.Ggrade,updatedGrade.Sno,updatedGrade.Cno)
 	if err != nil{
 		return err
 	}
@@ -160,7 +160,7 @@ func SearchGrade(db *sql.DB, studentID string)([]Grade,error){
 	var SearchResults []Grade
 	for rows.Next(){
 		var SearchResult Grade
-		if err := rows.Scan(&SearchResult.Sname,&SearchResult.Sno,&SearchResult.Cname,&SearchResult.Cno,&SearchResult._grade); err != nil{
+		if err := rows.Scan(&SearchResult.Sname,&SearchResult.Sno,&SearchResult.Cname,&SearchResult.Cno,&SearchResult.Ggrade); err != nil{
 			return nil,err
 		} 
 		SearchResults = append(SearchResults, SearchResult)
@@ -172,12 +172,12 @@ func SearchGrade(db *sql.DB, studentID string)([]Grade,error){
 }
 //成绩特征结构
 type GradeAttribution struct{
-	Sdept string
-	avg float64
-	max int
-	min int
-	Erate float64  //优秀率
-	failers int	 //不及格人数
+	Sdept string 
+	Avg sql.NullFloat64
+	Max sql.NullInt32
+	Min sql.NullInt32
+	Erate sql.NullFloat64  //优秀率
+	Failers sql.NullInt32	 //不及格人数
 }
 func GetAllGradesAttribution(db *sql.DB) ([]GradeAttribution,error){
 	rows, err := db.Query(`SELECT
@@ -197,7 +197,7 @@ func GetAllGradesAttribution(db *sql.DB) ([]GradeAttribution,error){
 	var attributions []GradeAttribution
 	for rows.Next(){
 		var attribution GradeAttribution
-		if err := rows.Scan(&attribution.Sdept,&attribution.avg,&attribution.max,&attribution.min,&attribution.Erate,&attribution.failers);err != nil{
+		if err := rows.Scan(&attribution.Sdept,&attribution.Avg,&attribution.Max,&attribution.Min,&attribution.Erate,&attribution.Failers);err != nil{
 			return nil,err
 		}
 		attributions = append(attributions,attribution)
@@ -209,10 +209,10 @@ func GetAllGradesAttribution(db *sql.DB) ([]GradeAttribution,error){
 }
 //排名结构
 type Rank struct{
-	_rank int
-	Sdept string
+	Rrank sql.NullInt32
+	Sdept sql.NullString
 	Sno string
-	Sname string
+	Sname sql.NullString
 }
 func GetAllRanks(db *sql.DB) ([]Rank,error){
 	rows, err := db.Query(`SELECT
@@ -236,7 +236,7 @@ ORDER BY
 	var ranks []Rank
 	for rows.Next(){
 		var rank Rank
-		if err := rows.Scan(&rank._rank,&rank.Sdept,&rank.Sno,&rank.Sname);err != nil{
+		if err := rows.Scan(&rank.Rrank,&rank.Sdept,&rank.Sno,&rank.Sname);err != nil{
 			return nil,err
 		}
 		ranks = append(ranks,rank)
@@ -249,9 +249,9 @@ ORDER BY
 //课程结构
 type Course struct{
 	Cno int
-	Cname string
-	Cpno int
-	Ccredit int	
+	Cname sql.NullString
+	Cpno sql.NullInt32
+	Ccredit sql.NullInt32
 }
 //课程表的插入操作
 func (course Course) AddNewCourse(db *sql.DB) error{
@@ -269,7 +269,7 @@ func (course Course) AddNewCourse(db *sql.DB) error{
 //获取表中所有的课程信息
 func GetAllCourses(db *sql.DB) ([]Course, error) {
 	// 查询数据库中的课程表
-    rows, err := db.Query("SELECT Cno, Cname, Cpno, Ccredit FROM Courses")
+    rows, err := db.Query("SELECT Cno, Cname, Cpno, Ccredit FROM Course")
     if err != nil {
         return nil, err
     }
@@ -308,13 +308,13 @@ func UpdateCourseInformation(db *sql.DB, updatedCourse Course) error {
 //删除课程信息
 func DeleteCourseFromDB(db *sql.DB, courseID string) error{
 	//执行数据库删除操作，删除指定 ID 的课程信息
-	qurey1 := "DELETE FROM Course WHERE Cno = ?"
+	qurey1 := "DELETE FROM SC WHERE Cno = ?"
 	_,err := db.Exec(qurey1,courseID)
 	if err != nil{
 		return err
 	}
 	//同时也要删除掉SC表中对应的内容
-	qurey2 := "DELETE FROM SC WHERE Cno = ?"
+	qurey2 := "DELETE FROM Course WHERE Cno = ?"
 	_,err = db.Exec(qurey2,courseID)
 	if err != nil{
 		return err

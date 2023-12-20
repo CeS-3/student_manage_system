@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	"os"
+	// "os"
 	"student_manage_system/dbstruct"
 
 	"github.com/gin-gonic/gin"
@@ -12,8 +12,10 @@ import (
 )
 
 //连接主机
-var sql_host = os.Getenv("sql_host")
-var sql_password = os.Getenv("sql_password")
+// var sql_host = os.Getenv("sql_host")
+// var sql_password = os.Getenv("sql_password")
+var sql_host = "Smanager"
+var sql_password = "Smanager" 
 //连接池对象
 var db *sql.DB
 //进行数据库的初始化
@@ -22,12 +24,12 @@ func db_init()(err error){
 	//连接数据集
 	db, err = sql.Open("mysql", dsn)
 	if err != nil {
-		fmt.Printf("开启 %s 时发生错误:%v\n", dsn, err)
+		fmt.Printf("Open %s failed:%v\n", dsn, err)
 		return err
 	}
 	err = db.Ping() //尝试连接数据库
 	if err != nil {
-		fmt.Printf("开启 %s 时发生错误:%v\n", dsn, err)
+		fmt.Printf("Open %s failed:%v\n", dsn, err)
 		return err
 	}
 	return nil
@@ -37,7 +39,7 @@ func main(){
 	//初始化数据库连接池
 	err := db_init()
 	if err != nil{
-		fmt.Printf("数据库初始化时发生错误:%v\n",err)
+		fmt.Printf("Init failed:%v\n",err)
 		return
 	}
 	defer db.Close()
@@ -58,21 +60,21 @@ func main(){
 	//添加新生
 	r.POST("/students/add", func(c *gin.Context) {
 		// 获取用户提交的新生信息
-		var newCourse dbstruct.Student
-		if err := c.ShouldBindJSON(&newCourse); err != nil {
+		var newStudent dbstruct.Student
+		if err := c.ShouldBind(&newStudent); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
 			return
 		}
 
 		// 执行插入操作
-		err := newCourse.AddNewStudent(db)
+		err := newStudent.AddNewStudent(db)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert course"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert student"})
 			return
 		}
 
 		// 返回成功信息给前端
-		c.JSON(http.StatusOK, gin.H{"message": "Course added successfully"})
+		c.JSON(http.StatusOK, gin.H{"message": "Student added successfully"})
 	})
 	//更新学生信息
 	r.POST("/students/:id/edit",func(c *gin.Context) {
@@ -103,7 +105,7 @@ func main(){
 		// 查询数据库中的所有课程
 		courses, err := dbstruct.GetAllCourses(db)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"错误": "获取课程失败"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve courses"})
 			return
 		}
 		// 返回课程列表给前端
@@ -113,7 +115,7 @@ func main(){
 	r.POST("/courses/add", func(c *gin.Context) {
 		// 获取用户提交的新增课程信息
 		var newCourse dbstruct.Course
-		if err := c.ShouldBindJSON(&newCourse); err != nil {
+		if err := c.ShouldBind(&newCourse); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
 			return
 		}
@@ -234,6 +236,7 @@ func main(){
 		}
 		c.JSON(http.StatusOK,SearchResults)
 	})
+	r.Run(":8080")
 }
 
 
