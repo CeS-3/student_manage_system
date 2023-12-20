@@ -61,6 +61,7 @@ func main(){
 	r.POST("/students/add", func(c *gin.Context) {
 		// 获取用户提交的新生信息
 		var newStudent dbstruct.Student
+		newStudent.InitStudent()
 		if err := c.ShouldBind(&newStudent); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
 			return
@@ -80,6 +81,7 @@ func main(){
 	r.POST("/students/:id/edit",func(c *gin.Context) {
 		//从前端获取更新的学生信息
 		var updateStudent dbstruct.Student
+		updateStudent.InitStudent()
 		if err := c.ShouldBind(&updateStudent);err != nil{
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
 		}
@@ -115,6 +117,7 @@ func main(){
 	r.POST("/courses/add", func(c *gin.Context) {
 		// 获取用户提交的新增课程信息
 		var newCourse dbstruct.Course
+		newCourse.InitCourse()
 		if err := c.ShouldBind(&newCourse); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
 			return
@@ -134,6 +137,7 @@ func main(){
 	r.POST("/courses/edit", func(c *gin.Context) {
 		// 获取用户提交的修改后的课程信息
 		var updatedCourse dbstruct.Course
+		updatedCourse.InitCourse()
 		if err := c.ShouldBind(&updatedCourse); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
 			return
@@ -175,6 +179,7 @@ func main(){
 	r.POST("/grades/add", func(c *gin.Context) {
 		// 获取用户提交的新增成绩信息
 		var newGrade dbstruct.Grade
+		newGrade.InitGrade()
 		if err := c.ShouldBind(&newGrade); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
 			return
@@ -194,6 +199,7 @@ func main(){
 	r.POST("/grades/edit", func(c *gin.Context) {
 		// 获取用户提交的修改后的成绩信息
 		var updatedGrade dbstruct.Grade
+		updatedGrade.InitGrade()
 		if err := c.ShouldBind(&updatedGrade); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
 			return

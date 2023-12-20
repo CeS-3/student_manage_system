@@ -13,6 +13,14 @@ type Student struct{
 	Sdept sql.NullString
 	Scholarship sql.NullString
 }
+//设置该类变量时要先初始化
+func (student Student) InitStudent() {
+	student.Sname.Valid = true
+	student.Ssex.Valid = true
+	student.Sage.Valid = true
+	student.Sdept.Valid = true
+	student.Scholarship.Valid = true	
+}
 //学生表的插入操作
 func (student Student) AddNewStudent(db *sql.DB) error{
 	query := "INSERT INTO Student (Sno, Sname, Ssex, Sage, Sdept, Scholarship) VALUES (?, ?, ?, ?, ?, ?)"
@@ -91,6 +99,12 @@ type Grade struct{
 	Cname sql.NullString
 	Cno int
 	Ggrade sql.NullInt32
+}
+//设置该类变量时要先初始化
+func (grade Grade) InitGrade(){
+	grade.Sname.Valid = true
+	grade.Cname.Valid = true
+	grade.Ggrade.Valid = true
 }
 //成绩插入操作
 func (grade Grade) AddNewGrade(db *sql.DB) error{
@@ -179,6 +193,13 @@ type GradeAttribution struct{
 	Erate sql.NullFloat64  //优秀率
 	Failers sql.NullInt32	 //不及格人数
 }
+func (ga GradeAttribution) InitGA(){
+	ga.Avg.Valid = true
+	ga.Max.Valid = true
+	ga.Min.Valid = true
+	ga.Erate.Valid = true
+	ga.Failers.Valid = true
+}
 func GetAllGradesAttribution(db *sql.DB) ([]GradeAttribution,error){
 	rows, err := db.Query(`SELECT
 	Student.Sdept, 
@@ -213,6 +234,11 @@ type Rank struct{
 	Sdept sql.NullString
 	Sno string
 	Sname sql.NullString
+}
+func (r Rank) InitRank(){
+	r.Rrank.Valid = true
+	r.Sdept.Valid = true
+	r.Sname.Valid = true
 }
 func GetAllRanks(db *sql.DB) ([]Rank,error){
 	rows, err := db.Query(`SELECT
@@ -252,6 +278,11 @@ type Course struct{
 	Cname sql.NullString
 	Cpno sql.NullInt32
 	Ccredit sql.NullInt32
+}
+func (C *Course)InitCourse(){
+	C.Cname.Valid = true
+	C.Cpno.Valid = true
+	C.Ccredit.Valid = true
 }
 //课程表的插入操作
 func (course Course) AddNewCourse(db *sql.DB) error{
