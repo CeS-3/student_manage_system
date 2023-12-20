@@ -145,8 +145,14 @@ func GetAllOrderedGrades(db *sql.DB) ([]Grade,error){
 	return grades,nil
 }
 //修改成绩
-func UpdateGradeInformation(db, studentID, courseID, updatedGrade){
-
+func UpdateGradeInformation(db *sql.DB, studentID int, courseID int, updatedGrade Grade) error{
+	query := "UPDATE SC SET Grade = ? WHERE Sno = ? AND Cno = ?"
+	_, err := db.Exec(query,updatedGrade._grade,studentID,courseID)
+	if err != nil{
+		return err
+	}
+	fmt.Println("成绩修改成功")
+	return nil
 }
 //课程结构
 type Course struct{
