@@ -3,11 +3,12 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"os"
-	_ "github.com/go-sql-driver/mysql"
-	"student_manage_system/dbstruct"
-	"github.com/gin-gonic/gin"
 	"net/http"
+	"os"
+	"student_manage_system/dbstruct"
+
+	"github.com/gin-gonic/gin"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 //连接主机
@@ -205,8 +206,25 @@ func main(){
 		// 返回成功信息给前端
 		c.JSON(http.StatusOK, gin.H{"message": "Grade updated successfully"})
 	})
-	
-
+	//展示成绩统计量
+	r.POST("/grades/attribution",func(c *gin.Context) {
+		attributions,err := dbstruct.GetAllGradesAttribution(db)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve grades attributions"})
+			return
+		}
+		c.JSON(http.StatusOK,attributions)
+	})
+	//设置搜索页面
+	r.GET("/grades/search/:sno",func(c *gin.Context) {
+		studentID := c.Param("sno")
+		SearchResults,err  := dbstruct.SearchGrade(db,studentID)
+		if err != nil{
+			c.JSON(http.StatusInternalServerError,gin.H{"error": "Failed to search grades"})
+			return 
+		}
+		c.JSON(http.StatusOK,SearchResults)
+	})
 }
 
 

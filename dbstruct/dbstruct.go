@@ -84,8 +84,7 @@ func DeleteStudentFromDB(db *sql.DB,studentID string) error{
 	return nil
 }
 
-//学生-课程结构
-
+//成绩
 type Grade struct{
 	Rank int
 	Sname string
@@ -93,14 +92,6 @@ type Grade struct{
 	Cname string
 	Cno int
 	_grade int
-}
-type GradeAttribution struct{
-	Sdept string
-	avg float64
-	max int
-	min int
-	Erate float64  //优秀率
-	failers int	 //不及格人数
 }
 //成绩插入操作
 func (grade Grade) AddNewGrade(db *sql.DB) error{
@@ -153,6 +144,70 @@ func UpdateGradeInformation(db *sql.DB, updatedGrade Grade) error{
 	}
 	fmt.Println("成绩修改成功")
 	return nil
+}
+//搜索成绩
+func SearchGrade(db *sql.DB, studentID string)([]Grade,error){
+	query := `SELECT ROW_NUMBER() OVER (ORDER BY SC.Grade DESC) AS Rank, 
+	Student.Sname,Student.Sno,Course.Cname,Course.Cno,SC.Grade 
+	FROM Student,Course,SC 
+	WHERE SC.Sno=Student.Sno 
+	AND SC.Cno=Course.Cno
+	AND Student.Sno=? 
+	ORDER BY SC.Grade DESC`
+	rows,err := db.Query(query,studentID)
+	if err != nil{
+		return nil,err
+	}
+	defer rows.Close()
+	var SearchResults []Grade
+	for rows.Next(){
+		var SearchResult Grade
+		if err := rows.Scan(&SearchResult.Rank,&SearchResult.Sname,&SearchResult.Sno,&SearchResult.Cname,&SearchResult.Cno,&SearchResult._grade); err != nil{
+			return nil,err
+		} 
+		SearchResults = append(SearchResults, SearchResult)
+	}
+	if err := rows.Err(); err != nil{
+		return nil,err
+	}
+	return SearchResults,nil  
+}
+//成绩特征结构
+type GradeAttribution struct{
+	Sdept string
+	avg float64
+	max int
+	min int
+	Erate float64  //优秀率
+	failers int	 //不及格人数
+}
+func GetAllGradesAttribution(db *sql.DB) ([]GradeAttribution,error){
+	rows, err := db.Query(`SELECT
+	Student.Sdept, 
+    AVG(SC.Grade), 
+    MAX(SC.Grade), 
+    MIN(SC.Grade), 
+    SUM(CASE WHEN Grade >= 90 THEN 1 ELSE 0 END) / COUNT(*) * 100, 
+    SUM(CASE WHEN Grade < 60 THEN 1 ELSE 0 END)
+	FROM SC,Student
+	WHERE SC.Sno = Student.Sno
+	GROUP BY Student.Sdept`)
+	if err != nil{
+		return nil,err
+	}
+	defer rows.Close()
+	var attributions []GradeAttribution
+	for rows.Next(){
+		var attribution GradeAttribution
+		if err := rows.Scan(&attribution.Sdept,&attribution.avg,&attribution.max,&attribution.min,&attribution.Erate,&attribution.failers);err != nil{
+			return nil,err
+		}
+		attributions = append(attributions,attribution)
+	}
+	if err := rows.Err(); err != nil{
+		return nil,err
+	}
+	return attributions,err
 }
 //课程结构
 type Course struct{
