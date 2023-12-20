@@ -52,17 +52,17 @@ func GetAllStudents(db *sql.DB) ([]Student,error){
 	return students,nil
 }
 //更新学生信息
-func UpdateStudentInformation(db *sql.DB,studentID string,updateStudent Student) error{
+func UpdateStudentInformation(db *sql.DB,updateStudent Student) error{
 	// 执行数据库更新操作，更新指定 ID 的学生信息
 	//构造查询语句
 	query := "UPDATE Course SET Sname = ?,Ssex = ?,Sage = ?,Sdept = ?,Scholarship = ? WHERE Sno = ?"
 	//执行语句
-	_,err := db.Exec(query,updateStudent.Sname,updateStudent.Ssex,updateStudent.Sage,updateStudent.Sdept,updateStudent.Scholarship,studentID)	
+	_,err := db.Exec(query,updateStudent.Sname,updateStudent.Ssex,updateStudent.Sage,updateStudent.Sdept,updateStudent.Scholarship,updateStudent.Sno)	
 	if err != nil{
 		return err
 	}
 	//执行成功输出
-	fmt.Printf("Updated Course with ID %s\n", studentID)
+	fmt.Printf("Updated Course with ID %d\n", updateStudent.Sno)
 	return nil
 }
 //删除学生信息
@@ -145,9 +145,9 @@ func GetAllOrderedGrades(db *sql.DB) ([]Grade,error){
 	return grades,nil
 }
 //修改成绩
-func UpdateGradeInformation(db *sql.DB, studentID int, courseID int, updatedGrade Grade) error{
+func UpdateGradeInformation(db *sql.DB, updatedGrade Grade) error{
 	query := "UPDATE SC SET Grade = ? WHERE Sno = ? AND Cno = ?"
-	_, err := db.Exec(query,updatedGrade._grade,studentID,courseID)
+	_, err := db.Exec(query,updatedGrade._grade,updatedGrade.Sno,updatedGrade.Cno)
 	if err != nil{
 		return err
 	}
@@ -200,17 +200,17 @@ func GetAllCourses(db *sql.DB) ([]Course, error) {
     return courses, nil
 }
 //修改课程信息
-func UpdateCourseInformation(db *sql.DB, courseID string, updatedCourse Course) error {
+func UpdateCourseInformation(db *sql.DB, updatedCourse Course) error {
 	// 执行数据库更新操作，更新指定 ID 的课程信息
 	//构造查询语句
 	query := "UPDATE Course SET Cname = ?,Cpno = ?,Ccredit = ? WHERE Cno = ?"
 	//执行语句
-	_,err := db.Exec(query,updatedCourse.Cname,updatedCourse.Cpno,updatedCourse.Ccredit,courseID)	
+	_,err := db.Exec(query,updatedCourse.Cname,updatedCourse.Cpno,updatedCourse.Ccredit,updatedCourse.Cno)	
 	if err != nil{
 		return err
 	}
 	//执行成功输出
-	fmt.Printf("Updated Course with ID %s\n", courseID)
+	fmt.Printf("Updated Course with ID %d\n", updatedCourse.Cno)
 	return nil
 }
 //删除课程信息

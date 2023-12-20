@@ -75,13 +75,12 @@ func main(){
 	})
 	//更新学生信息
 	r.POST("/students/:id/edit",func(c *gin.Context) {
-		//从前端获取学号
-		studentID := c.Param("id")
+		//从前端获取更新的学生信息
 		var updateStudent dbstruct.Student
 		if err := c.ShouldBind(&updateStudent);err != nil{
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
 		}
-		err = dbstruct.UpdateStudentInformation(db,studentID,updateStudent)
+		err = dbstruct.UpdateStudentInformation(db,updateStudent)
 		if err != nil{
 			c.JSON(http.StatusInternalServerError,gin.H{"error": "Failed to update Student"})
 		}
@@ -129,9 +128,7 @@ func main(){
 		c.JSON(http.StatusOK, gin.H{"message": "Course added successfully"})
 	})
 	//修改课程信息,一次只能修改一条
-	r.POST("/courses/:id/edit", func(c *gin.Context) {
-		// 从路由参数中获取课程 ID
-		courseID := c.Param("id")
+	r.POST("/courses/edit", func(c *gin.Context) {
 		// 获取用户提交的修改后的课程信息
 		var updatedCourse dbstruct.Course
 		if err := c.ShouldBind(&updatedCourse); err != nil {
@@ -140,7 +137,7 @@ func main(){
 		}
 
 		// 执行更新操作
-		err = dbstruct.UpdateCourseInformation(db, courseID, updatedCourse)
+		err = dbstruct.UpdateCourseInformation(db, updatedCourse)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update course"})
 			return
@@ -191,11 +188,7 @@ func main(){
 		c.JSON(http.StatusOK, gin.H{"message": "Grade added successfully"})
 	})
 	//修改学生成绩
-	r.POST("/grades/:sno/:cno/edit", func(c *gin.Context) {
-		// 从路由参数中获取学号和课程号
-		studentID := c.Param("sno")
-		courseID := c.Param("cno")
-
+	r.POST("/grades/edit", func(c *gin.Context) {
 		// 获取用户提交的修改后的成绩信息
 		var updatedGrade dbstruct.Grade
 		if err := c.ShouldBind(&updatedGrade); err != nil {
@@ -204,7 +197,7 @@ func main(){
 		}
 
 		// 执行更新操作
-		err := dbstruct.UpdateGradeInformation(db, studentID, courseID, updatedGrade)
+		err := dbstruct.UpdateGradeInformation(db, updatedGrade)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update grade"})
 			return
@@ -212,6 +205,7 @@ func main(){
 		// 返回成功信息给前端
 		c.JSON(http.StatusOK, gin.H{"message": "Grade updated successfully"})
 	})
+	
 
 }
 
