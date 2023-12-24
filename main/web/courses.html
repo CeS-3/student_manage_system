@@ -14,7 +14,6 @@
         header {
             background-color: #333;
             color: white;
-            text-align: center;
             padding: 1em;
         }
 
@@ -69,7 +68,8 @@
 </head>
 <body>
     <header>
-        <h2>课程信息</h2>
+        <button onclick="goBack()" style="text-align: left;">返回</button>
+        <h1 style="text-align: center;">课程信息</h1>
     </header>
 
     <main>
@@ -243,6 +243,9 @@
                 
                 hideUpdatePrompt();
                 location.reload(true);
+        }
+        function goBack() {
+            window.history.back();
         }
     </script>
 </body>

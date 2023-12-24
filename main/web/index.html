@@ -5,60 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>学生管理系统</title>
     <style>
-        /* 样式可以根据需要进一步调整 */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
 
-        header {
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 1em;
-        }
+    header {
+        background-color: #333;
+        color: white;
+        text-align: center;
+        padding: 1em;
+    }
 
-        nav {
-            background-color: #f0f0f0;
-            padding: 1em;
-            width: 200px;
-            position: fixed;
-            height: 100%;
-            overflow: auto;
-        }
+    main {
+        padding: 1em;
+        text-align: center; /* 居中文本 */
+    }
 
-        main {
-            margin-left: 220px;
-            padding: 1em;
-        }
+    ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
 
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+    li {
+        margin-bottom: 20px;
+    }
 
-        li {
-            margin-bottom: 10px;
-        }
+
+    a {
+        text-decoration: none;
+        color: #333;
+        display: inline-block;
+        padding: 20px 300px; /* 调整内边距，使选项更大 */
+        font-size: 100px; /* 调整字体大小 */
+        border: 1px solid #333;
+        border-radius: 5px;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    a:hover {
+        background-color: #333; /* 悬停时的背景色 */
+        color: white; /* 悬停时的文字颜色 */
+    }
     </style>
 </head>
 <body>
     <header>
         <h1>学生管理系统</h1>
     </header>
-
-    <nav>
+    <main>
         <ul>
             <li><a href="/showStudents">学生信息</a></li>
             <li><a href="/showCourses">课程信息</a></li>
             <li><a href="/showGrades">成绩信息</a></li>
         </ul>
-    </nav>
-
-    <main>
-        <!-- 主要内容将动态填充至此 -->
     </main>
 </body>
 </html>

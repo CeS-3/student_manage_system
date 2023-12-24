@@ -14,7 +14,6 @@
         header {
             background-color: #333;
             color: white;
-            text-align: center;
             padding: 1em;
         }
 
@@ -70,7 +69,8 @@
 </head>
 <body>
     <header>
-        <h2>学生信息</h2>
+        <button onclick="goBack()" style="text-align: left;">返回</button>
+        <h1 style="text-align: center;">学生信息</h1>
     </header>
 
     <main>
@@ -243,7 +243,7 @@
                 const inputSdept = document.getElementById('nSdept').value;
                 const inputScholarship = document.getElementById('nScholarship').value;
                    // 构建要插入的学生信息对象
-                const updatedStudent = {
+                const insertedStudent = {
                     Sno: `${inputSno}`,
                     Sname: { String: `${inputSname}`, Valid: true },
                     Ssex: { String: `${inputSsex}`, Valid: true },
@@ -258,7 +258,7 @@
                     //设置请求头为json格式
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(updatedStudent)
+                body: JSON.stringify(insertedStudent)
             })
                 .then(response => {
                     console.log(response)
@@ -274,6 +274,9 @@
 
         function hideInsertPrompt(){
             document.getElementById('custom-modal-2').style.display = 'none';
+        }
+        function goBack() {
+            window.history.back();
         }
     </script>
 </body>
