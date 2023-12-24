@@ -45,10 +45,25 @@ func main(){
 	defer db.Close()
 	//初始化gin引擎
 	r := gin.Default()
+	//web页面交互
+	r.LoadHTMLGlob("web/*")
 	r.GET("/",func(c *gin.Context) {
-		c.HTML(http.StatusOK, "web/index.html", gin.H{
+		c.HTML(http.StatusOK, "index.html", gin.H{
 			"title": "欢迎使用学生管理系统",
 		})
+	})
+	r.GET("/showStudents",func(c *gin.Context) {
+		c.HTML(http.StatusOK,"students.html",gin.H{
+			"title": "欢迎使用学生管理系统",
+		})
+	})
+	r.GET("/showCourses",func(c *gin.Context) {
+		c.HTML(http.StatusOK,"courses.html",gin.H{
+			"title": "欢迎使用学生管理系统",})
+	})
+	r.GET("/showGrades",func(c *gin.Context) {
+		c.HTML(http.StatusOK,"grades.html",gin.H{
+			"title": "欢迎使用学生管理系统",})
 	})
 	//展示学生信息
 	r.GET("/students", func(c *gin.Context) {
@@ -109,6 +124,7 @@ func main(){
 	})
 	//展示所有课程信息
 	r.GET("/courses", func(c *gin.Context) {
+
 		// 查询数据库中的所有课程
 		courses, err := dbstruct.GetAllCourses(db)
 		if err != nil {

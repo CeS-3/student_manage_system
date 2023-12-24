@@ -73,22 +73,11 @@
 </head>
 <body>
     <header>
-        <h1>学生管理系统</h1>
+        <h1>成绩信息</h1>
     </header>
-
-    <nav>
-        <ul>
-            <li><a href="#students">学生信息</a></li>
-            <li><a href="#courses">课程信息</a></li>
-            <li><a href="#grades">成绩信息</a></li>
-        </ul>
-    </nav>
-
     <main>
         <!-- 成绩信息展示页 -->
         <section id="gradesSection">
-            <h2>成绩信息</h2>
-
             <!-- 搜索栏 -->
             <div id="searchBar">
                 <input type="text" id="searchInput" placeholder="输入学号搜索">
@@ -111,10 +100,8 @@
                 </tbody>
             </table>
         </section>
-            <!-- 新增和修改成绩的弹窗 -->
             <div id="gradeModal" class="modal">
                 <div class="modal-content">
-                    <span class="close" onclick="closeGradeModal()">&times;</span>
                     <h3 id="gradeModalTitle">新增成绩</h3>
                     <form id="gradeForm">
                         <label for="studentID">学号:</label>
@@ -200,7 +187,6 @@
                             <td>${grade.Ggrade.Int32 || ""}</td>
                             <td>
                                 <button onclick="updateGrade('${grade.Sno}')">更新</button>
-                                <button onclick="deleteGrade('${grade.Sno}')">删除</button>
                             </td>
                         `;
                     });
@@ -208,21 +194,22 @@
 
                 window.updateGrade = function(studentID) {
                     // 此处添加更新成绩信息的逻辑
+                    
                     console.log(`Update grade for student with ID: ${studentID}`);
                 }
 
-                window.deleteGrade = function(studentID) {
-                    const confirmDelete = confirm("确定要删除该学生成绩吗？");
-                    if (confirmDelete) {
-                        fetch(`/grades/${studentID}`, { method: 'DELETE' })
-                            .then(response => response.json())
-                            .then(result => {
-                                console.log(result.message);
-                                fetchGrades(); // 刷新成绩信息
-                            })
-                            .catch(error => console.error('Error deleting grade:', error));
-                    }
-                }
+                // window.deleteGrade = function(studentID) {
+                //     const confirmDelete = confirm("确定要删除该学生成绩吗？");
+                //     if (confirmDelete) {
+                //         fetch(`/grades/${studentID}`, { method: 'DELETE' })
+                //             .then(response => response.json())
+                //             .then(result => {
+                //                 console.log(result.message);
+                //                 fetchGrades(); // 刷新成绩信息
+                //             })
+                //             .catch(error => console.error('Error deleting grade:', error));
+                //     }
+                // }
 
                 // 搜索功能的逻辑
                 function searchGrades() {
@@ -236,29 +223,15 @@
                         .catch(error => console.error('Error searching grades:', error));
                 }
 
-                // 其他板块的功能和类似的 JavaScript 代码会逐步添加
             });
-        </script>
-                <script>
             // 新增和修改成绩弹窗的逻辑
             const gradeModal = document.getElementById("gradeModal");
             const gradeForm = document.getElementById("gradeForm");
             const gradeModalTitle = document.getElementById("gradeModalTitle");
 
-            function openGradeModal() {
-                gradeModal.style.display = "block";
-            }
-
-            function closeGradeModal() {
-                gradeModal.style.display = "none";
-            }
-
             function submitGradeForm() {
                 // 提交新增/修改成绩的表单逻辑
-                // ...
-
-                // 关闭弹窗
-                closeGradeModal();
+                fetch("/grade/")                
             }
 
             // 成绩统计量和排名信息的获取和显示逻辑
@@ -282,12 +255,12 @@
                 attributions.forEach(attribution => {
                     const row = tableBody.insertRow();
                     row.innerHTML = `
-                        <td>${attribution.Sdept || ""}</td>
-                        <td>${attribution.Avg.Float64 || ""}</td>
-                        <td>${attribution.Max.Int32 || ""}</td>
-                        <td>${attribution.Min.Int32 || ""}</td>
-                        <td>${attribution.Erate.Float64 || ""}</td>
-                        <td>${attribution.Failers.Int32 || ""}</td>
+                        <td>${attribution.Sdept || "无"}</td>
+                        <td>${attribution.Avg.Float64 || "无"}</td>
+                        <td>${attribution.Max.Int32 || "无"}</td>
+                        <td>${attribution.Min.Int32 || "无"}</td>
+                        <td>${attribution.Erate.Float64 || "无"}</td>
+                        <td>${attribution.Failers.Int32 || "0"}</td>
                     `;
                 });
             }
@@ -310,7 +283,7 @@
                     const row = tableBody.insertRow();
                     row.innerHTML = `
                         <td>${rank.Rrank.Int32 || ""}</td>
-                        <td>${rank.Sdept || ""}</td>
+                        <td>${rank.Sdept.String || ""}</td>
                         <td>${rank.Sno || ""}</td>
                         <td>${rank.Sname.String || ""}</td>
                     `;

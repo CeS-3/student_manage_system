@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>课程信息</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1em;
+        }
+
+        main {
+            margin: 1em;
+        }
+
         table {
             border-collapse: collapse;
             width: 100%;
@@ -31,20 +48,49 @@
     </style>
 </head>
 <body>
-    <table id="coursesTable">
-        <thead>
-            <tr>
-                <th>课程号</th>
-                <th>课程名</th>
-                <th>先修课程号</th>
-                <th>学分</th>
-                <th>操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- 课程信息将动态填充至此 -->
-        </tbody>
-    </table>
+    <header>
+        <h2>课程信息</h2>
+    </header>
+
+    <main>
+        <table id="coursesTable">
+            <thead>
+                <tr>
+                    <th>课程编号</th>
+                    <th>课程名称</th>
+                    <th>先修课程编号</th>
+                    <th>学分</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 课程信息将动态填充至此 -->
+            </tbody>
+        </table>
+        <div id="gradeModal" class="modal">
+            <div class="modal-content">
+                <h3 id="gradeModalTitle">新增课程</h3>
+                <form id="gradeForm">
+                    <label for="Cno">课程编号:</label>
+                    <input type="text" id="Cno" name="Cno" required>
+
+                    <label for="Cname">课程编号:</label>
+                    <input type="text" id="Cname" name="Cname" required> 
+                    
+                    <label for="courseName">先修课程编号:</label>
+                    <input type="text" id="Cpno" name="Cpno" required>
+
+                    <label for="courseID">学分:</label>
+                    <input type="text" id="Ccredit" name="Ccredit" required>
+
+                    <label for="course">操作:</label>
+                    <input type="text" id="course" name="course" required>
+
+                    <button type="button" onclick="submitCourseForm()">确认</button>
+                </form>
+            </div>
+        </div>
+    </main>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -81,6 +127,7 @@
 
             window.updateCourse = function(courseID) {
                 // 此处添加更新课程信息的逻辑
+                fetch(`/courses/courseID`,{method: "POST"})
                 console.log(`Update course with ID: ${courseID}`);
             }
 
@@ -93,7 +140,7 @@
                             console.log(result.message);
                             fetchCourses(); // 刷新课程信息
                         })
-                        .catch(error => console.error('Error deleting course:', error));
+                        //.catch(error => console.error('Error deleting course:', error));
                 }
             }
         });

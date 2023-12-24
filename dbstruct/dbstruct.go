@@ -63,14 +63,14 @@ func GetAllStudents(db *sql.DB) ([]Student,error){
 func UpdateStudentInformation(db *sql.DB,updateStudent Student) error{
 	// 执行数据库更新操作，更新指定 ID 的学生信息
 	//构造查询语句
-	query := "UPDATE Course SET Sname = ?,Ssex = ?,Sage = ?,Sdept = ?,Scholarship = ? WHERE Sno = ?"
+	query := "UPDATE Student SET Sname = ?,Ssex = ?,Sage = ?,Sdept = ?,Scholarship = ? WHERE Sno = ?"
 	//执行语句
 	_,err := db.Exec(query,updateStudent.Sname,updateStudent.Ssex,updateStudent.Sage,updateStudent.Sdept,updateStudent.Scholarship,updateStudent.Sno)	
 	if err != nil{
 		return err
 	}
 	//执行成功输出
-	fmt.Printf("Updated Course with ID %s\n", updateStudent.Sno)
+	fmt.Printf("Updated Student with ID %s\n", updateStudent.Sno)
 	return nil
 }
 //删除学生信息

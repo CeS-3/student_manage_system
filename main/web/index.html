@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>学生管理系统</title>
     <style>
+        /* 样式可以根据需要进一步调整 */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -32,28 +33,14 @@
             padding: 1em;
         }
 
-        table {
-            border-collapse: collapse;
-            width: 100%;
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
 
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        button {
-            padding: 10px;
-            margin: 5px;
-            cursor: pointer;
+        li {
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -64,30 +51,14 @@
 
     <nav>
         <ul>
-            <li><a href="#students">学生信息</a></li>
-            <li><a href="#courses">课程信息</a></li>
-            <li><a href="#grades">成绩信息</a></li>
+            <li><a href="/showStudents">学生信息</a></li>
+            <li><a href="/showCourses">课程信息</a></li>
+            <li><a href="/showGrades">成绩信息</a></li>
         </ul>
     </nav>
 
     <main>
-        <!-- 学生信息 -->
-        <section id="students">
-            <h2>学生信息</h2>
-            <iframe src="students.html" width="100%" height="600px" frameborder="0"></iframe>
-        </section>
-
-        <!-- 课程信息 -->
-        <section id="courses">
-            <h2>课程信息</h2>
-            <iframe src="courses.html" width="100%" height="600px" frameborder="0"></iframe>
-        </section>
-
-        <!-- 成绩信息 -->
-        <section id="grades">
-            <h2>成绩信息</h2>
-            <iframe src="grades.html" width="100%" height="600px" frameborder="0"></iframe>
-        </section>
+        <!-- 主要内容将动态填充至此 -->
     </main>
 </body>
 </html>

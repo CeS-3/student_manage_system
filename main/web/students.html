@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>学生信息</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1em;
+        }
+
+        main {
+            margin: 1em;
+        }
+
         table {
             border-collapse: collapse;
             width: 100%;
@@ -28,27 +45,99 @@
             margin: 5px;
             cursor: pointer;
         }
+                /* Styles for the modal */
+        #custom-modal-1 {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        #custom-modal-2 {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
-    <table id="studentsTable">
-        <thead>
-            <tr>
-                <th>学号</th>
-                <th>姓名</th>
-                <th>性别</th>
-                <th>年龄</th>
-                <th>专业</th>
-                <th>奖学金</th>
-                <th>操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- 学生信息将动态填充至此 -->
-        </tbody>
-    </table>
+    <header>
+        <h2>学生信息</h2>
+    </header>
+
+    <main>
+        <table id="studentsTable">
+            <thead>
+                <tr>
+                    <th>学号</th>
+                    <th>姓名</th>
+                    <th>性别</th>
+                    <th>年龄</th>
+                    <th>专业</th>
+                    <th>奖学金</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 学生信息将动态填充至此 -->
+            </tbody>
+        </table>
+        <button onclick="showInsertPrompt()">新增</button>
+<!-- 用于更新 -->
+        <div id="custom-modal-1">
+            <label for="Sname">姓名:</label>
+            <input type="text" id="Sname"><br>
+        
+            <label for="Ssex">性别:</label>
+            <input type="text" id="Ssex"><br>
+        
+            <label for="Sage">年龄:</label>
+            <input type="number" id="Sage"><br>
+        
+            <label for="Sdept">专业:</label>
+            <input type="text" id="Sdept"><br>
+
+            <label for="Scholarship">奖学金:</label>
+            <input type="text" id="Scholarship"><br>
+        
+            <button onclick="updateStudent(Sno)">确定</button>
+            <button onclick="hideUpdatePrompt()">取消</button>
+        </div>
+<!-- 用于新增 -->
+        <div id="custom-modal-2">
+            <label for="Sname">学号:</label>
+            <input type="text" id="nSno"><br>
+
+            <label for="Sname">姓名:</label>
+            <input type="text" id="nSname"><br>
+        
+            <label for="Ssex">性别:</label>
+            <input type="text" id="nSsex"><br>
+        
+            <label for="Sage">年龄:</label>
+            <input type="number" id="nSage"><br>
+        
+            <label for="Sdept">专业:</label>
+            <input type="text" id="nSdept"><br>
+
+            <label for="Scholarship">奖学金:</label>
+            <input type="text" id="nScholarship"><br>
+        
+            <button onclick="insertStudent()">确定</button>
+            <button onclick="hideInsertPrompt()">取消</button>
+        </div>
+    </main>
 
     <script>
+        var Sno;
         document.addEventListener("DOMContentLoaded", function() {
             // 获取学生信息并显示
             fetchStudents();
@@ -76,19 +165,63 @@
                         <td>${student.Sdept.String || ""}</td>
                         <td>${student.Scholarship.String || ""}</td>
                         <td>
-                            <button onclick="updateStudent('${student.Sno}')">更新</button>
+                            <button onclick="showUpdatePrompt('${student.Sno}')">更新</button>
                             <button onclick="deleteStudent('${student.Sno}')">删除</button>
                         </td>
                     `;
                 });
             }
 
-            window.updateStudent = function(studentID) {
-                // 此处添加更新学生信息的逻辑
+           
+        });
+
+        function showUpdatePrompt(studentID) {
+            Sno = studentID;
+            document.getElementById('custom-modal-1').style.display = 'block';
+        }
+
+
+        function hideUpdatePrompt() {
+            document.getElementById('custom-modal-1').style.display = 'none';
+        }
+
+        function updateStudent(studentID) {
+                //获取输入的信息
+                const inputSno = Sno;
+                const inputSname = document.getElementById('Sname').value;
+                const inputSsex = document.getElementById('Ssex').value;
+                const inputSage = parseInt(document.getElementById('Sage').value,10);
+                const inputSdept = document.getElementById('Sdept').value;
+                const inputScholarship = document.getElementById('Scholarship').value;
+                //构筑要更新的学生信息的对象
+                   // 构建要更新的学生信息对象
+                const updatedStudent = {
+                    Sno: `${inputSno}`,
+                    Sname: { String: `${inputSname}`, Valid: true },
+                    Ssex: { String: `${inputSsex}`, Valid: true },
+                    Sage: { Int32: inputSage, Valid: true },
+                    Sdept: { String: `${inputSdept}`, Valid: true },
+                    Scholarship: { String: `${inputScholarship}`, Valid: true }
+                };
+                //发送请求
+                fetch(`/students/edit`,{
+                method: 'POST',
+                headers: {
+                    //设置请求头为json格式
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedStudent)
+            })
+                .then(response => {
+                    console.log(response)
+                })
+                
                 console.log(`Update student with ID: ${studentID}`);
+                hideUpdatePrompt();
+                location.reload(true);
             }
 
-            window.deleteStudent = function(studentID) {
+        function  deleteStudent(studentID) {
                 const confirmDelete = confirm("确定要删除该学生吗？");
                 if (confirmDelete) {
                     fetch(`/students/${studentID}`, { method: 'DELETE' })
@@ -99,8 +232,51 @@
                         })
                         .catch(error => console.error('Error deleting student:', error));
                 }
-            }
-        });
+                location.reload(true);
+        }
+        //实现新增学生信息
+        function insertStudent(){
+             //获取输入的信息
+                const inputSno = document.getElementById('nSno').value;
+                const inputSname = document.getElementById('nSname').value;
+                const inputSsex = document.getElementById('nSsex').value;
+                const inputSage = parseInt(document.getElementById('nSage').value,10);
+                const inputSdept = document.getElementById('nSdept').value;
+                const inputScholarship = document.getElementById('nScholarship').value;
+                   // 构建要插入的学生信息对象
+                const updatedStudent = {
+                    Sno: `${inputSno}`,
+                    Sname: { String: `${inputSname}`, Valid: true },
+                    Ssex: { String: `${inputSsex}`, Valid: true },
+                    Sage: { Int32: inputSage, Valid: true },
+                    Sdept: { String: `${inputSdept}`, Valid: true },
+                    Scholarship: { String: `${inputScholarship}`, Valid: true }
+                };
+                //发送请求
+                fetch(`/students/add`,{
+                method: 'POST',
+                headers: {
+                    //设置请求头为json格式
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedStudent)
+            })
+                .then(response => {
+                    console.log(response)
+                })
+                
+                console.log(`Insert student with ID: ${studentID}`);
+                hideInsertPrompt();
+                location.reload(true);
+        }
+
+        function showInsertPrompt() {
+            document.getElementById('custom-modal-2').style.display = 'block';
+        }
+
+        function hideInsertPrompt(){
+            document.getElementById('custom-modal-2').style.display = 'none';
+        }
     </script>
 </body>
 </html>
