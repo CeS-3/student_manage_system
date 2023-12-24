@@ -274,7 +274,7 @@ ORDER BY
 }
 //课程结构
 type Course struct{
-	Cno int
+	Cno string
 	Cname sql.NullString
 	Cpno sql.NullInt32
 	Ccredit sql.NullInt32
@@ -333,25 +333,33 @@ func UpdateCourseInformation(db *sql.DB, updatedCourse Course) error {
 		return err
 	}
 	//执行成功输出
-	fmt.Printf("Updated Course with ID %d\n", updatedCourse.Cno)
+	fmt.Printf("Updated Course with ID %s\n", updatedCourse.Cno)
 	return nil
 }
 //删除课程信息
 func DeleteCourseFromDB(db *sql.DB, courseID string) error{
-	//执行数据库删除操作，删除指定 ID 的课程信息
-	qurey1 := "DELETE FROM SC WHERE Cno = ?"
+	qurey1 := "DELETE FROM SC WHERE Cno = ? "
 	_,err := db.Exec(qurey1,courseID)
 	if err != nil{
 		return err
 	}
-	//同时也要删除掉SC表中对应的内容
-	qurey2 := "DELETE FROM Course WHERE Cno = ?"
+	qurey2 := "DELETE FROM SC WHERE Cno = (SELECT Cno FROM Course WHERE Cpno = ?)"
 	_,err = db.Exec(qurey2,courseID)
 	if err != nil{
 		return err
 	}
+	query3 := "DELETE FROM Course WHERE Cpno = ?"
+	_,err = db.Exec(query3,courseID)
+	if err != nil{
+		return err
+	}
+	qurey4 := "DELETE FROM Course WHERE Cno = ?"
+	_,err = db.Exec(qurey4,courseID)
+	if err != nil{
+		return err
+	}
+	
 	//执行成功输出
 	fmt.Printf("Delete Course with ID %s\n",courseID)
 	return nil
 }
-

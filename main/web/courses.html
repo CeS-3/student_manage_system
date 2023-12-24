@@ -45,6 +45,26 @@
             margin: 5px;
             cursor: pointer;
         }
+        #custom-modal-1 {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        #custom-modal-2 {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -67,32 +87,42 @@
                 <!-- 课程信息将动态填充至此 -->
             </tbody>
         </table>
-        <div id="gradeModal" class="modal">
-            <div class="modal-content">
-                <h3 id="gradeModalTitle">新增课程</h3>
-                <form id="gradeForm">
-                    <label for="Cno">课程编号:</label>
-                    <input type="text" id="Cno" name="Cno" required>
+        <button onclick="showInsertPrompt()">新增</button>
+        <!-- 用于更新 -->
+        <div id="custom-modal-1">
+            <label for="Cname">课程名:</label>
+            <input type="text" id="Cname" name="Cname"> <br>
+            
+            <label for="Cpno">先修课程编号:</label>
+            <input type="text" id="Cpno" name="Cpno"><br>
 
-                    <label for="Cname">课程编号:</label>
-                    <input type="text" id="Cname" name="Cname" required> 
-                    
-                    <label for="courseName">先修课程编号:</label>
-                    <input type="text" id="Cpno" name="Cpno" required>
+            <label for="Ccredit">学分:</label>
+            <input type="text" id="Ccredit" name="Ccredit"><br>
+        
+            <button onclick="updateCourse()">确定</button>
+            <button onclick="hideUpdatePrompt()">取消</button>
+        </div>
+<!-- 用于新增 -->
+        <div id="custom-modal-2">
+            <label for="Cno">课程编号:</label>
+            <input type="text" id="nCno" name="Cno"><br>
 
-                    <label for="courseID">学分:</label>
-                    <input type="text" id="Ccredit" name="Ccredit" required>
+            <label for="Cname">课程名:</label>
+            <input type="text" id="nCname" name="Cname"> <br>
+            
+            <label for="Cpno">先修课程编号:</label>
+            <input type="text" id="nCpno" name="Cpno"><br>
 
-                    <label for="course">操作:</label>
-                    <input type="text" id="course" name="course" required>
+            <label for="Ccredit">学分:</label>
+            <input type="text" id="nCcredit" name="Ccredit"><br>
 
-                    <button type="button" onclick="submitCourseForm()">确认</button>
-                </form>
-            </div>
+            <button onclick="insertCourse()">确定</button>
+            <button onclick="hideInsertPrompt()">取消</button>
         </div>
     </main>
 
     <script>
+        var Cno;
         document.addEventListener("DOMContentLoaded", function() {
             // 获取课程信息并显示
             fetchCourses();
@@ -118,32 +148,102 @@
                         <td>${course.Cpno.Int32 || ""}</td>
                         <td>${course.Ccredit.Int32 || ""}</td>
                         <td>
-                            <button onclick="updateCourse('${course.Cno}')">更新</button>
+                            <button onclick="showUpdatePrompt('${course.Cno}')">更新</button>
                             <button onclick="deleteCourse('${course.Cno}')">删除</button>
                         </td>
                     `;
                 });
             }
+        });
+       function updateCourse() {
+                //获取输入的信息
+                const inputCno = Cno;
+                const inputCname = document.getElementById('Cname').value;
+                const inputCpno = parseInt(document.getElementById('Cpno').value,10);
+                const inputCcredit = parseInt(document.getElementById('Ccredit').value,10);
 
-            window.updateCourse = function(courseID) {
-                // 此处添加更新课程信息的逻辑
-                fetch(`/courses/courseID`,{method: "POST"})
-                console.log(`Update course with ID: ${courseID}`);
-            }
+                const updatedCourse = {
+                    Cno: `${inputCno}`,
+                    Cname: { String: `${inputCname}`, Valid: true },
+                    Cpno: { Int32: inputCpno, Valid: true },
+                    Ccredit: { Int32: inputCcredit, Valid: true }
+                };
+                //发送请求
+                fetch(`/courses/edit`,{
+                method: 'POST',
+                headers: {
+                    //设置请求头为json格式
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedCourse)
+            })
+                .then(response => {
+                    console.log(response)
+                })
+                
+                hideUpdatePrompt();
+                location.reload(true);
+        }
+        function showUpdatePrompt(courseID) {
+            Cno = courseID;
+            document.getElementById('custom-modal-1').style.display = 'block';
+        }
 
-            window.deleteCourse = function(courseID) {
+
+        function hideUpdatePrompt() {
+            document.getElementById('custom-modal-1').style.display = 'none';
+        }
+
+           function deleteCourse(courseID) {
                 const confirmDelete = confirm("确定要删除该课程吗？");
                 if (confirmDelete) {
                     fetch(`/courses/${courseID}`, { method: 'DELETE' })
-                        .then(response => response.json())
-                        .then(result => {
-                            console.log(result.message);
-                            fetchCourses(); // 刷新课程信息
-                        })
-                        //.catch(error => console.error('Error deleting course:', error));
+                        // .then(response => response.json())
+                        // .then(result => {
+                        //     fetchCourses(); // 刷新课程信息
+                        // })
+                        //.catch(error => console.error('Error deleting course:', error));· 
                 }
+                location.reload(true);
             }
-        });
+
+        function showInsertPrompt() {
+            document.getElementById('custom-modal-2').style.display = 'block';
+        }
+
+        function hideInsertPrompt(){
+            document.getElementById('custom-modal-2').style.display = 'none';
+        }
+        
+        function insertCourse(){
+            //获取输入的信息
+                const inputCno = document.getElementById('nCno').value;
+                const inputCname = document.getElementById('nCname').value;
+                const inputCpno = parseInt(document.getElementById('nCpno').value,10);
+                const inputCcredit = parseInt(document.getElementById('nCcredit').value,10);
+
+                const updatedCourse = {
+                    Cno: `${inputCno}`,
+                    Cname: { String: `${inputCname}`, Valid: true },
+                    Cpno: { Int32: inputCpno, Valid: true },
+                    Ccredit: { Int32: inputCcredit, Valid: true }
+                };
+                 //发送请求
+                 fetch(`/courses/add`,{
+                method: 'POST',
+                headers: {
+                    //设置请求头为json格式
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedCourse)
+            })
+                .then(response => {
+                    console.log(response)
+                })
+                
+                hideUpdatePrompt();
+                location.reload(true);
+        }
     </script>
 </body>
 </html>

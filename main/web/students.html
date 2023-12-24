@@ -108,7 +108,7 @@
             <label for="Scholarship">奖学金:</label>
             <input type="text" id="Scholarship"><br>
         
-            <button onclick="updateStudent(Sno)">确定</button>
+            <button onclick="updateStudent()">确定</button>
             <button onclick="hideUpdatePrompt()">取消</button>
         </div>
 <!-- 用于新增 -->
@@ -185,7 +185,7 @@
             document.getElementById('custom-modal-1').style.display = 'none';
         }
 
-        function updateStudent(studentID) {
+        function updateStudent() {
                 //获取输入的信息
                 const inputSno = Sno;
                 const inputSname = document.getElementById('Sname').value;
@@ -216,7 +216,6 @@
                     console.log(response)
                 })
                 
-                console.log(`Update student with ID: ${studentID}`);
                 hideUpdatePrompt();
                 location.reload(true);
             }
@@ -265,7 +264,6 @@
                     console.log(response)
                 })
                 
-                console.log(`Insert student with ID: ${studentID}`);
                 hideInsertPrompt();
                 location.reload(true);
         }

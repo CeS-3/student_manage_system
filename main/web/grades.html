@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Management System</title>
+    <title>成绩信息</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -69,6 +69,16 @@
             padding: 10px;
             cursor: pointer;
         }
+        #custom-modal-1 {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -100,27 +110,15 @@
                 </tbody>
             </table>
         </section>
-            <div id="gradeModal" class="modal">
-                <div class="modal-content">
-                    <h3 id="gradeModalTitle">新增成绩</h3>
-                    <form id="gradeForm">
-                        <label for="studentID">学号:</label>
-                        <input type="text" id="studentID" name="studentID" required>
+
+            <div id="custom-modal-1">
     
-                        <label for="courseName">课程名:</label>
-                        <input type="text" id="courseName" name="courseName" required>
-    
-                        <label for="courseID">课程号:</label>
-                        <input type="text" id="courseID" name="courseID" required>
-    
-                        <label for="grade">成绩:</label>
-                        <input type="text" id="grade" name="grade" required>
-    
-                        <button type="button" onclick="submitGradeForm()">确认</button>
-                    </form>
-                </div>
+                <label for="grade">成绩修改为:</label>
+                <input type="number" id="Grade" name="grade" required>
+            
+                <button onclick="updateGrade()">确定</button>
+                <button onclick="hideUpdatePrompt()">取消</button>
             </div>
-    
             <!-- 成绩统计量展示页 -->
             <section id="attributionSection">
                 <h2>成绩统计量</h2>
@@ -160,6 +158,7 @@
             </section>
     
         <script>
+            var Sno,Ccno,Sname,Cname;
             document.addEventListener("DOMContentLoaded", function() {
                 // 获取成绩信息并显示
                 fetchGrades();
@@ -186,30 +185,11 @@
                             <td>${grade.Cno || ""}</td>
                             <td>${grade.Ggrade.Int32 || ""}</td>
                             <td>
-                                <button onclick="updateGrade('${grade.Sno}')">更新</button>
+                                <button onclick="showUpdatePrompt(${grade.Sno},${grade.Sname.String || ""},${grade.Cno || ""},${grade.Cname.String || ""}')">更新</button>
                             </td>
                         `;
                     });
                 }
-
-                window.updateGrade = function(studentID) {
-                    // 此处添加更新成绩信息的逻辑
-                    
-                    console.log(`Update grade for student with ID: ${studentID}`);
-                }
-
-                // window.deleteGrade = function(studentID) {
-                //     const confirmDelete = confirm("确定要删除该学生成绩吗？");
-                //     if (confirmDelete) {
-                //         fetch(`/grades/${studentID}`, { method: 'DELETE' })
-                //             .then(response => response.json())
-                //             .then(result => {
-                //                 console.log(result.message);
-                //                 fetchGrades(); // 刷新成绩信息
-                //             })
-                //             .catch(error => console.error('Error deleting grade:', error));
-                //     }
-                // }
 
                 // 搜索功能的逻辑
                 function searchGrades() {
@@ -224,16 +204,45 @@
                 }
 
             });
-            // 新增和修改成绩弹窗的逻辑
-            const gradeModal = document.getElementById("gradeModal");
-            const gradeForm = document.getElementById("gradeForm");
-            const gradeModalTitle = document.getElementById("gradeModalTitle");
 
-            function submitGradeForm() {
-                // 提交新增/修改成绩的表单逻辑
-                fetch("/grade/")                
+            function showUpdatePrompt(studentID,studentName,courseID,courseName) {
+                Sno = studentID;
+                Sname = studentName;
+                Ccno = parseInt(courseID);
+                Cname = courseName;
+                document.getElementById('custom-modal-1').style.display = 'block';
             }
 
+            function hideUpdatePrompt() {
+                document.getElementById('custom-modal-1').style.display = 'none';
+            }
+
+            function updateGrade(){
+                const inputGrade = parseInt(document.getElementById("Grade").value,10);
+                //构造对象
+                const updatedGrade = {
+                    Sname: { String: `${Sname}`, Valid: true },
+                    Sno: `${Sno}`,
+                    Cname: { String: `${Cname}`, Valid: true },
+                    Cno: Ccno,
+                    Ggrade: inputGrade
+                };
+                //发送请求
+                fetch(`/grades/edit`,{
+                method: 'POST',
+                headers: {
+                    //设置请求头为json格式
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedGrade)
+            })
+                .then(response => {
+                    console.log(response)
+                })
+                
+                hideUpdatePrompt();
+                location.reload(true);                
+            }
             // 成绩统计量和排名信息的获取和显示逻辑
             fetchGradesAttribution();
             fetchRanks();
