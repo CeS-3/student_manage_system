@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	"os"
+	// "os"
 	"student_manage_system/dbstruct"
 
 	"github.com/gin-gonic/gin"
@@ -12,9 +12,10 @@ import (
 )
 
 //连接主机
-var sql_host = os.Getenv("sql_host")
-var sql_password = os.Getenv("sql_password")
-
+// var sql_host = os.Getenv("sql_host")
+// var sql_password = os.Getenv("sql_password")
+var sql_host = "Smanager"
+var sql_password = "Smanager" 
 //连接池对象
 var db *sql.DB
 //进行数据库的初始化
@@ -62,6 +63,10 @@ func main(){
 	})
 	r.GET("/showGrades",func(c *gin.Context) {
 		c.HTML(http.StatusOK,"grades.html",gin.H{
+			"title": "欢迎使用学生管理系统",})
+	})
+	r.GET("/showSearch",func(c *gin.Context) {
+		c.HTML(http.StatusOK,"search.html",gin.H{
 			"title": "欢迎使用学生管理系统",})
 	})
 	//展示学生信息
@@ -252,7 +257,7 @@ func main(){
 		}
 		c.JSON(http.StatusOK,ranks)
 	})
-	//设置搜索页面
+	//设置成绩搜索页面
 	r.GET("/grades/search/:sno",func(c *gin.Context) {
 		studentID := c.Param("sno")
 		SearchResults,err  := dbstruct.SearchGrade(db,studentID)
@@ -261,6 +266,16 @@ func main(){
 			return 
 		}
 		c.JSON(http.StatusOK,SearchResults)
+	})
+	//设置总搜索页面
+	r.GET("/search/:sno",func(c *gin.Context) {
+		studentID := c.Param("sno")
+		SearchResult,err := dbstruct.Search(db,studentID)
+		if err != nil{
+			c.JSON(http.StatusInternalServerError,gin.H{"error": "Failed to search information"})
+			return
+		}
+		c.JSON(http.StatusOK,SearchResult)
 	})
 	r.Run(":8080")
 }

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 1em;
+        }
+
+        main {
+            margin: 1em;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        /* 搜索栏样式 */
+        #searchBar {
+            margin-bottom: 20px;
+        }
+
+        #searchBar input[type="text"] {
+            padding: 10px;
+        }
+
+        #searchBar button {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        #studentsTable{
+            display: none;
+        }
+        #coursesTable{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <button onclick="goBack()" style="text-align: left;">返回</button>
+        <h1 style="text-align: center;">搜索栏</h1>
+    </header>
+    <main>
+            <!-- 搜索栏 -->
+            <div id="searchBar">
+                <input type="text" id="searchInput" placeholder="输入学号搜索">
+                <button onclick="searchGrades()">搜索</button>
+            </div>
+            <table id="studentsTable">
+                <thead>
+                    <tr>
+                        <th>学号</th>
+                        <th>姓名</th>
+                        <th>性别</th>
+                        <th>年龄</th>
+                        <th>专业</th>
+                        <th>奖学金</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 学生信息将动态填充至此 -->
+                </tbody>
+            </table>
+            <table id="coursesTable">
+                <thead>
+                    <tr>
+                        <th>课程编号</th>
+                        <th>课程名称</th>
+                        <th>先修课程编号</th>
+                        <th>学分</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 课程信息将动态填充至此 -->
+                </tbody>
+            </table>
+
+    </main>
+        <script>
+            
+            // 搜索功能的逻辑
+            function searchGrades() {
+                    const searchInput = document.querySelector("#searchInput").value;
+                    fetch(`/search/${searchInput}`)
+                        .then(response => response.json())
+                        .then(results => {
+                            // 显示搜索结果
+                            showStudentTable();
+                            displayStudents(results.SI);
+                            showCourseTable();
+                            displayCourses(results.CI);
+                        })
+                        .catch(error => console.error('Error searching grades:', error));
+            }
+            //
+            function displayStudents(student) {
+                const tableBody = document.querySelector("#studentsTable tbody");
+                tableBody.innerHTML = "";
+
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${student.Sno}</td>
+                        <td>${student.Sname.String || ""}</td>
+                        <td>${student.Ssex.String || ""}</td>
+                        <td>${student.Sage.Int32 || ""}</td>
+                        <td>${student.Sdept.String || ""}</td>
+                        <td>${student.Scholarship.String || ""}</td>
+                    `;
+            }
+
+            function displayCourses(courses) {
+                const tableBody = document.querySelector("#coursesTable tbody");
+                tableBody.innerHTML = "";
+
+                courses.forEach(course => {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${course.Cno}</td>
+                        <td>${course.Cname.String || ""}</td>
+                        <td>${course.Cpno.Int32 || ""}</td>
+                        <td>${course.Ccredit.Int32 || ""}</td>
+                    `;
+                });
+            }
+
+            function showStudentTable() {
+                document.getElementById('studentsTable').style.display = 'block';
+            }
+            function showCourseTable(){
+                document.getElementById('coursesTable').style.display = 'block';
+            }
+            function goBack() {
+            window.history.back();
+        }
+        </script>
+</body>
+</html>

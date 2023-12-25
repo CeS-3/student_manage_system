@@ -363,3 +363,44 @@ func DeleteCourseFromDB(db *sql.DB, courseID string) error{
 	fmt.Printf("Delete Course with ID %s\n",courseID)
 	return nil
 }
+type SearchResult struct{
+	SI Student
+	CI []Course
+}
+func Search(db *sql.DB,Sno string)(SearchResult,error){
+	var result SearchResult 
+	query1 := "SELECT Sno,Sname,Ssex,Sage,Sdept,Scholarship FROM Student WHERE Sno = ?"
+	rows1,err := db.Query(query1,Sno)
+	if err != nil{
+		return result,err
+	}
+	defer rows1.Close()
+	if rows1.Next(){
+		if err := rows1.Scan(&result.SI.Sno,&result.SI.Sname,&result.SI.Ssex,&result.SI.Sage,&result.SI.Sdept,&result.SI.Scholarship);err != nil{
+			return result,err
+		}
+	}
+	if err := rows1.Err(); err != nil {
+        return result, err
+    }
+	query2 := "SELECT Cno, Cname, Cpno, Ccredit FROM Course WHERE Cno IN (SELECT Cno FROM SC WHERE Sno = ?)"
+	rows2,err := db.Query(query2,Sno)
+	if err != nil{
+		return result,err
+	}
+	defer rows2.Close()
+	var courses []Course
+	for rows2.Next() {
+        var course Course
+        if err := rows2.Scan(&course.Cno, &course.Cname, &course.Cpno, &course.Ccredit); err != nil {
+            return result, err
+        }
+        courses = append(courses, course)
+    }
+
+    if err := rows2.Err(); err != nil {
+        return result, err
+    }
+	result.CI = courses
+	return result,nil
+}

@@ -133,14 +133,9 @@
             </div>
 
             <div id="custom-modal-2">
-                <label for="Sname">姓名:</label>
-                <input type="text" id="nSname" name="Sname"><br>
 
                 <label for="Sno">学号:</label>
                 <input type="text" id="nSno" name="Sno"><br>
-
-                <label for="Cname">课程名:</label>
-                <input type="text" id="nCname" name="Cname"><br>
 
                 <label for="Cno">课程号:</label>
                 <input type="number" id="nCno" name="Cno"><br> 
@@ -325,15 +320,13 @@
             function insertGrade(){
                 //获取输入的信息
                 const inputSno = document.getElementById('nSno').value;
-                const inputSname = document.getElementById('nSname').value;
                 const inputCno = parseInt(document.getElementById('nCno').value,10);
-                const inputCname = document.getElementById('nCname').value;
                 const inputGrade = parseInt(document.getElementById('nGrade').value,10);
 
                 const insertedGrade = {
-                    Sname: { String: `${inputSname}`, Valid: true },
+                    Sname: { String: "", Valid: true },
                     Sno: `${inputSno}`,
-                    Cname: { String: `${inputCname}`, Valid: true },
+                    Cname: { String: "", Valid: true },
                     Cno: inputCno,
                     Ggrade: { Int32: inputGrade, Valid: true }
                 };
