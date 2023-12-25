@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	// "os"
+	"os"
 	"student_manage_system/dbstruct"
 
 	"github.com/gin-gonic/gin"
@@ -12,10 +12,8 @@ import (
 )
 
 //连接主机
-// var sql_host = os.Getenv("sql_host")
-// var sql_password = os.Getenv("sql_password")
-var sql_host = "Smanager"
-var sql_password = "Smanager" 
+var sql_host = os.Getenv("sql_host")
+var sql_password = os.Getenv("sql_password")
 //连接池对象
 var db *sql.DB
 //进行数据库的初始化
